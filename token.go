@@ -7,6 +7,7 @@ import (
 )
 
 type ApiCredentials struct {
+	APIClient *http.Client
 	APIKey    string
 	AuthToken string
 }
