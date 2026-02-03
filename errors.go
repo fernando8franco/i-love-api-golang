@@ -1,6 +1,7 @@
 package iloveapigolang
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -16,4 +17,19 @@ func (e *APIError) Error() string {
 
 func (e *APIError) IsUnauthorized() bool {
 	return e.statusCode == http.StatusUnauthorized
+}
+
+func handleError(res *http.Response) error {
+	var errorRes struct {
+		Message string `json:"message"`
+	}
+
+	if err := json.NewDecoder(res.Body).Decode(&errorRes); err != nil {
+		return err
+	}
+
+	return &APIError{
+		statusCode: res.StatusCode,
+		message:    errorRes.Message,
+	}
 }

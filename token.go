@@ -25,7 +25,7 @@ func (ac ApiCredentials) GetToken() (token string, err error) {
 
 	req, err := http.NewRequest(
 		"POST",
-		AuthURL,
+		authURL,
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
@@ -41,7 +41,7 @@ func (ac ApiCredentials) GetToken() (token string, err error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode > 299 {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
 		return "", handleError(res)
 	}
 
@@ -53,19 +53,4 @@ func (ac ApiCredentials) GetToken() (token string, err error) {
 	}
 
 	return response.Token, nil
-}
-
-func handleError(res *http.Response) error {
-	var errorRes struct {
-		Message string `json:"message"`
-	}
-
-	if err := json.NewDecoder(res.Body).Decode(&errorRes); err != nil {
-		return err
-	}
-
-	return &APIError{
-		statusCode: res.StatusCode,
-		message:    errorRes.Message,
-	}
 }
