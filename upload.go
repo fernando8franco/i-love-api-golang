@@ -10,7 +10,6 @@ import (
 )
 
 type UploadRequest struct {
-	Server       string
 	TaskID       string
 	File         io.Reader
 	FileName     string
@@ -21,8 +20,8 @@ type UploadResponse struct {
 	ServerFilename string `json:"server_filename"`
 }
 
-func (c *Client) Upload(params UploadRequest) (UploadResponse, error) {
-	url := fmt.Sprintf(uploadURL, params.Server)
+func (c *Client) Upload(server string, params UploadRequest) (UploadResponse, error) {
+	url := fmt.Sprintf(uploadURL, server)
 
 	var body io.Reader
 	var contentType string
@@ -98,7 +97,7 @@ func prepareCloudBody(params UploadRequest) (io.Reader, string, error) {
 
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf("error encoding request:\n%v", err)
 	}
 
 	return bytes.NewReader(jsonBody), "application/json", nil

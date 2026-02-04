@@ -6,19 +6,14 @@ import (
 	"net/http"
 )
 
-type StartRequest struct {
-	Tool   string
-	Region string
-}
-
 type StartResponse struct {
 	Server           string `json:"server"`
 	Task             string `json:"task"`
 	RemainingCredits int    `json:"remaining_credits"`
 }
 
-func (c *Client) Start(params StartRequest) (StartResponse, error) {
-	url := fmt.Sprintf(startURL, params.Tool, params.Region)
+func (c *Client) Start(tool, region string) (StartResponse, error) {
+	url := fmt.Sprintf(startURL, tool, region)
 
 	req, err := http.NewRequest(
 		"GET",
