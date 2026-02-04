@@ -11,7 +11,7 @@ type ProcessRequest struct {
 	Task  string  `json:"task"`
 	Tool  string  `json:"tool"`
 	Files []Files `json:"files"`
-	Meta  Meta    `json:"meta"`
+	Meta  `json:"meta"`
 	CompressOptions
 }
 

@@ -20,6 +20,10 @@ func (c *Client) SetAPIKey(newAPIKey string) {
 	c.apiKey = newAPIKey
 }
 
+func (c *Client) GetAPIKey() string {
+	return c.apiKey
+}
+
 func (c *Client) SetToken(newToken string) {
 	c.token = newToken
 }
