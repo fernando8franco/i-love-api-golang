@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) GetToken() (string, error) {
+func (c *Client) Token() (string, error) {
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
