@@ -69,7 +69,7 @@ func (c *Client) Process(server string, params ProcessRequest) (ProcessResponse,
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
+	if res.StatusCode < 200 || res.StatusCode > 299 {
 		return ProcessResponse{}, handleError(res)
 	}
 

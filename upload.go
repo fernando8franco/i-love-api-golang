@@ -10,7 +10,7 @@ import (
 )
 
 type UploadRequest struct {
-	TaskID       string
+	Task         string
 	File         io.Reader
 	FileName     string
 	CloudFileURL string
@@ -81,6 +81,11 @@ func prepareLocalBody(params UploadRequest) (io.Reader, string, error) {
 			pw.CloseWithError(err)
 			return
 		}
+
+		if err := writer.WriteField("task", params.Task); err != nil {
+			pw.CloseWithError(err)
+			return
+		}
 	}()
 
 	return pr, writer.FormDataContentType(), nil
@@ -91,7 +96,7 @@ func prepareCloudBody(params UploadRequest) (io.Reader, string, error) {
 		Task      string `json:"Task"`
 		CloudFile string `json:"CloudFile"`
 	}{
-		Task:      params.TaskID,
+		Task:      params.Task,
 		CloudFile: params.CloudFileURL,
 	}
 
