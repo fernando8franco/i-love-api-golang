@@ -3,25 +3,20 @@ package iloveapigolang
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
-type ApiCredentials struct {
-	APIClient *http.Client
-	APIKey    string
-	AuthToken string
-}
-
-func (ac ApiCredentials) GetToken() (token string, err error) {
+func (c *Client) GetToken() (string, error) {
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
-		PublicKey: ac.APIKey,
+		PublicKey: c.apiKey,
 	}
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error encoding request:\n%v", err)
 	}
 
 	req, err := http.NewRequest(
@@ -30,15 +25,14 @@ func (ac ApiCredentials) GetToken() (token string, err error) {
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error creating request:\n%v", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error sending request:\n%v", err)
 	}
 	defer res.Body.Close()
 
@@ -50,7 +44,7 @@ func (ac ApiCredentials) GetToken() (token string, err error) {
 		Token string `json:"token"`
 	}{}
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return "", err
+		return "", fmt.Errorf("error decoding response:\n%v", err)
 	}
 
 	return response.Token, nil

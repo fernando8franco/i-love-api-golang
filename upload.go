@@ -10,6 +10,7 @@ import (
 )
 
 type UploadRequest struct {
+	Server       string
 	TaskID       string
 	File         io.Reader
 	FileName     string
@@ -20,8 +21,8 @@ type UploadResponse struct {
 	ServerFilename string `json:"server_filename"`
 }
 
-func (ac ApiCredentials) Upload(server string, params UploadRequest) (UploadResponse, error) {
-	url := fmt.Sprintf(uploadURL, server)
+func (c *Client) Upload(params UploadRequest) (UploadResponse, error) {
+	url := fmt.Sprintf(uploadURL, params.Server)
 
 	var body io.Reader
 	var contentType string
@@ -43,9 +44,9 @@ func (ac ApiCredentials) Upload(server string, params UploadRequest) (UploadResp
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", "Bearer "+ac.AuthToken)
+	req.Header.Set("Authorization", "Bearer "+c.token)
 
-	res, err := ac.APIClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return UploadResponse{}, fmt.Errorf("error sending request:\n%v", err)
 	}
@@ -57,35 +58,33 @@ func (ac ApiCredentials) Upload(server string, params UploadRequest) (UploadResp
 
 	var response UploadResponse
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return UploadResponse{}, fmt.Errorf("error decoding response body:\n%v", err)
+		return UploadResponse{}, fmt.Errorf("error decoding response:\n%v", err)
 	}
 
 	return response, nil
 }
 
 func prepareLocalBody(params UploadRequest) (io.Reader, string, error) {
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	formFieldName := "file"
-	part, err := writer.CreateFormFile(formFieldName, params.FileName)
-	if err != nil {
-		return nil, "", fmt.Errorf("error creating form file:\n%v", err)
-	}
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	_, err = io.Copy(part, params.File)
-	if err != nil {
-		return nil, "", fmt.Errorf("error copying file data:\n%v", err)
-	}
+		part, err := writer.CreateFormFile("file", params.FileName)
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
 
-	writer.WriteField("task", params.TaskID)
+		if _, err := io.Copy(part, params.File); err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+	}()
 
-	err = writer.Close()
-	if err != nil {
-		return nil, "", fmt.Errorf("error closing writer:\n%v", err)
-	}
-
-	return body, writer.FormDataContentType(), nil
+	return pr, writer.FormDataContentType(), nil
 }
 
 func prepareCloudBody(params UploadRequest) (io.Reader, string, error) {
