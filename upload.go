@@ -20,7 +20,7 @@ type UploadResponse struct {
 	ServerFilename string `json:"server_filename"`
 }
 
-func (c *Client) Upload(server string, params UploadRequest) (UploadResponse, error) {
+func (c *Client) Upload(token, server string, params UploadRequest) (UploadResponse, error) {
 	url := fmt.Sprintf(uploadURL, server)
 
 	var body io.Reader
@@ -43,7 +43,7 @@ func (c *Client) Upload(server string, params UploadRequest) (UploadResponse, er
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

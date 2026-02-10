@@ -12,7 +12,7 @@ type StartResponse struct {
 	RemainingCredits int    `json:"remaining_credits"`
 }
 
-func (c *Client) Start(tool, region string) (StartResponse, error) {
+func (c *Client) Start(token, tool, region string) (StartResponse, error) {
 	url := fmt.Sprintf(startURL, tool, region)
 
 	req, err := http.NewRequest(
@@ -24,7 +24,7 @@ func (c *Client) Start(tool, region string) (StartResponse, error) {
 		return StartResponse{}, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

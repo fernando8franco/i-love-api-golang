@@ -46,7 +46,7 @@ type ProcessResponse struct {
 	Status           string `json:"status"`
 }
 
-func (c *Client) Process(server string, params ProcessRequest) (ProcessResponse, error) {
+func (c *Client) Process(token, server string, params ProcessRequest) (ProcessResponse, error) {
 	processUrl := fmt.Sprintf(processURL, server)
 
 	jsonBody, err := json.Marshal(params)
@@ -61,7 +61,7 @@ func (c *Client) Process(server string, params ProcessRequest) (ProcessResponse,
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) Dowload(server, task string, file io.Writer) (io.ReadCloser, error) {
+func (c *Client) Dowload(token, server, task string, file io.Writer) (io.ReadCloser, error) {
 	dowloadUrl := fmt.Sprintf(dowloadURL, server, task)
 
 	req, err := http.NewRequest("GET", dowloadUrl, nil)
@@ -14,7 +14,7 @@ func (c *Client) Dowload(server, task string, file io.Writer) (io.ReadCloser, er
 		return nil, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

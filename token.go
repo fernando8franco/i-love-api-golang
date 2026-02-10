@@ -7,11 +7,11 @@ import (
 	"net/http"
 )
 
-func (c *Client) GenerateToken() (string, error) {
+func (c *Client) GenerateToken(apiKey string) (string, error) {
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
-		PublicKey: c.apiKey,
+		PublicKey: apiKey,
 	}
 
 	jsonData, err := json.Marshal(data)
