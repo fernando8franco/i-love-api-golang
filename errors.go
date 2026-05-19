@@ -3,6 +3,7 @@ package iloveapigolang
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -12,24 +13,28 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("api error: status %d\nresponse body: %s", e.statusCode, e.message)
-}
-
-func (e *APIError) IsUnauthorized() bool {
-	return e.statusCode == http.StatusUnauthorized
+	return fmt.Sprintf("API error %d: %s", e.statusCode, e.message)
 }
 
 func handleError(res *http.Response) error {
+	apiErr := &APIError{
+		statusCode: res.StatusCode,
+	}
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		apiErr.message = "failed to read error response body"
+		return apiErr
+	}
+
+	apiErr.message = string(bodyBytes)
+
 	var errorRes struct {
 		Message string `json:"message"`
 	}
-
-	if err := json.NewDecoder(res.Body).Decode(&errorRes); err != nil {
-		return err
+	if err := json.Unmarshal(bodyBytes, &errorRes); err == nil && errorRes.Message != "" {
+		apiErr.message = errorRes.Message
 	}
 
-	return &APIError{
-		statusCode: res.StatusCode,
-		message:    errorRes.Message,
-	}
+	return apiErr
 }

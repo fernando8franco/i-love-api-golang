@@ -2,38 +2,40 @@ package iloveapigolang
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-type ProcessRequest struct {
-	Task  string  `json:"task"`
-	Tool  string  `json:"tool"`
-	Files []Files `json:"files"`
-	Meta  `json:"meta"`
+type ProcessParams struct {
+	Server string
+	Task   string
+	Tool   string
+	Files  []Files
+	Meta
 	CompressOptions
 }
 
 type Files struct {
-	ServerFileName string `json:"server_filename"`
-	FileName       string `json:"filename"`
+	ServerFileName string
+	FileName       string
 }
 
 type Meta struct {
-	Title        string `json:"Title"`
-	Author       string `json:"Author"`
-	Subject      string `json:"Subject"`
-	Keywords     string `json:"Keywords"`
-	Creator      string `json:"Creator"`
-	Producer     string `json:"Producer"`
-	CreationDate string `json:"CreationDate"`
-	ModDate      string `json:"ModDate"`
-	Trapped      string `json:"Trapped"`
+	Title        string
+	Author       string
+	Subject      string
+	Keywords     string
+	Creator      string
+	Producer     string
+	CreationDate string
+	ModDate      string
+	Trapped      string
 }
 
 type CompressOptions struct {
-	CompressionLevel string `json:"compression_level"`
+	CompressionLevel string
 }
 
 type ProcessResponse struct {
@@ -46,8 +48,8 @@ type ProcessResponse struct {
 	Status           string `json:"status"`
 }
 
-func (c *Client) Process(token, server string, params ProcessRequest) (ProcessResponse, error) {
-	processUrl := fmt.Sprintf(processURL, server)
+func (c *Client) Process(ctx context.Context, params ProcessParams) (ProcessResponse, error) {
+	processUrl := fmt.Sprintf(processURL, params.Server)
 
 	jsonBody, err := json.Marshal(params)
 	if err != nil {
@@ -55,16 +57,24 @@ func (c *Client) Process(token, server string, params ProcessRequest) (ProcessRe
 	}
 	body := bytes.NewReader(jsonBody)
 
-	req, err := http.NewRequest("POST", processUrl, body)
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		processUrl,
+		body,
+	)
 	if err != nil {
 		return ProcessResponse{}, fmt.Errorf("error creating request:\n%v", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+c.getToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
+		if ctx.Err() != nil {
+			return ProcessResponse{}, fmt.Errorf("request cancelled or timed out: %w", ctx.Err())
+		}
 		return ProcessResponse{}, fmt.Errorf("error sending request:\n%v", err)
 	}
 	defer res.Body.Close()

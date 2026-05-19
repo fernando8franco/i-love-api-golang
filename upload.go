@@ -2,6 +2,7 @@ package iloveapigolang
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +10,8 @@ import (
 	"net/http"
 )
 
-type UploadRequest struct {
+type UploadParams struct {
+	Server       string
 	Task         string
 	File         io.Reader
 	FileName     string
@@ -20,8 +22,8 @@ type UploadResponse struct {
 	ServerFilename string `json:"server_filename"`
 }
 
-func (c *Client) Upload(token, server string, params UploadRequest) (UploadResponse, error) {
-	url := fmt.Sprintf(uploadURL, server)
+func (c *Client) Upload(ctx context.Context, params UploadParams) (UploadResponse, error) {
+	url := fmt.Sprintf(uploadURL, params.Server)
 
 	var body io.Reader
 	var contentType string
@@ -37,16 +39,24 @@ func (c *Client) Upload(token, server string, params UploadRequest) (UploadRespo
 		return UploadResponse{}, err
 	}
 
-	req, err := http.NewRequest("POST", url, body)
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		url,
+		body,
+	)
 	if err != nil {
 		return UploadResponse{}, fmt.Errorf("error creating request:\n%v", err)
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+c.getToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
+		if ctx.Err() != nil {
+			return UploadResponse{}, fmt.Errorf("request cancelled or timed out: %w", ctx.Err())
+		}
 		return UploadResponse{}, fmt.Errorf("error sending request:\n%v", err)
 	}
 	defer res.Body.Close()
@@ -63,7 +73,7 @@ func (c *Client) Upload(token, server string, params UploadRequest) (UploadRespo
 	return response, nil
 }
 
-func prepareLocalBody(params UploadRequest) (io.Reader, string, error) {
+func prepareLocalBody(params UploadParams) (io.Reader, string, error) {
 	pr, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
 
@@ -91,7 +101,7 @@ func prepareLocalBody(params UploadRequest) (io.Reader, string, error) {
 	return pr, writer.FormDataContentType(), nil
 }
 
-func prepareCloudBody(params UploadRequest) (io.Reader, string, error) {
+func prepareCloudBody(params UploadParams) (io.Reader, string, error) {
 	body := struct {
 		Task      string `json:"Task"`
 		CloudFile string `json:"CloudFile"`
