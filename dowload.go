@@ -29,6 +29,9 @@ func (c *Client) Download(ctx context.Context, params DowloadParams) (io.ReadClo
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, fmt.Errorf("request cancelled or timed out: %w", ctx.Err())
+		}
 		return nil, fmt.Errorf("error sending request:\n%v", err)
 	}
 
