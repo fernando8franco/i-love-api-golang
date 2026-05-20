@@ -22,14 +22,8 @@ func NewClient(httpClient *http.Client) *Client {
 	}
 }
 
-func (c *Client) getToken() string {
+func (c *Client) GetToken() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.token
-}
-
-func (c *Client) UpdateToken(newToken string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.token = newToken
 }

@@ -25,7 +25,7 @@ func (c *Client) Download(ctx context.Context, params DowloadParams) (io.ReadClo
 		return nil, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.getToken())
+	req.Header.Set("Authorization", "Bearer "+c.GetToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

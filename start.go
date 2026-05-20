@@ -31,7 +31,7 @@ func (c *Client) Start(ctx context.Context, params StartParams) (StartResponse, 
 		return StartResponse{}, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.getToken())
+	req.Header.Set("Authorization", "Bearer "+c.GetToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
