@@ -10,32 +10,32 @@ import (
 
 type ProcessParams struct {
 	Server string
-	Task   string
-	Tool   string
-	Files  []Files
+	Task   string  `json:"task"`
+	Tool   string  `json:"tool"`
+	Files  []Files `json:"files"`
 	Meta
 	CompressOptions
 }
 
 type Files struct {
-	ServerFileName string
-	FileName       string
+	ServerFileName string `json:"server_filename"`
+	FileName       string `json:"filename"`
 }
 
 type Meta struct {
-	Title        string
-	Author       string
-	Subject      string
-	Keywords     string
-	Creator      string
-	Producer     string
-	CreationDate string
-	ModDate      string
-	Trapped      string
+	Title        string `json:"title"`
+	Author       string `json:"author"`
+	Subject      string `json:"subject"`
+	Keywords     string `json:"keywords"`
+	Creator      string `json:"creator"`
+	Producer     string `json:"producer"`
+	CreationDate string `json:"creation_date"`
+	ModDate      string `json:"mod_date"`
+	Trapped      string `json:"trapped"`
 }
 
 type CompressOptions struct {
-	CompressionLevel string
+	CompressionLevel string `json:"compression_level"`
 }
 
 type ProcessResponse struct {
