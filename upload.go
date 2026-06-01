@@ -11,6 +11,7 @@ import (
 )
 
 type UploadParams struct {
+	Token        string
 	Server       string
 	Task         string
 	File         io.Reader
@@ -50,7 +51,7 @@ func (c *Client) Upload(ctx context.Context, params UploadParams) (UploadRespons
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", "Bearer "+c.GetToken())
+	req.Header.Set("Authorization", "Bearer "+params.Token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
