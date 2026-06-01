@@ -51,7 +51,7 @@ func (c *Client) Upload(ctx context.Context, params UploadParams) (UploadRespons
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", "Bearer "+params.Token)
+	req.Header.Set("Authorization", "Bearer "+c.GetToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

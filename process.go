@@ -69,7 +69,7 @@ func (c *Client) Process(ctx context.Context, params ProcessParams) (ProcessResp
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+params.Token)
+	req.Header.Set("Authorization", "Bearer "+c.GetToken())
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
