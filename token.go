@@ -8,14 +8,14 @@ import (
 	"net/http"
 )
 
-func (c *Client) GenerateToken(ctx context.Context, apiKey string) error {
+func (c *Client) GenerateToken(ctx context.Context) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
-		PublicKey: apiKey,
+		PublicKey: c.apiKey,
 	}
 
 	jsonData, err := json.Marshal(data)

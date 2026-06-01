@@ -8,17 +8,20 @@ import (
 
 type Client struct {
 	httpClient *http.Client
+	apiKey     string
 	token      string
 	mu         sync.RWMutex
 }
 
-func NewClient(httpClient *http.Client) *Client {
+func NewClient(httpClient *http.Client, apiKey, token string) *Client {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: 10 * time.Second}
 	}
 
 	return &Client{
 		httpClient: httpClient,
+		apiKey:     apiKey,
+		token:      token,
 	}
 }
 
