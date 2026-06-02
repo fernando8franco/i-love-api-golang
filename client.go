@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/singleflight"
 )
 
 type Client struct {
@@ -11,6 +13,7 @@ type Client struct {
 	apiKey     string
 	token      string
 	mu         sync.RWMutex
+	sfGroup    singleflight.Group
 }
 
 func NewClient(httpClient *http.Client, apiKey, token string) *Client {

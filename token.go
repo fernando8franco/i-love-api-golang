@@ -55,5 +55,6 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 	}
 
 	c.token = response.Token
+	fmt.Println(c.token)
 	return nil
 }
