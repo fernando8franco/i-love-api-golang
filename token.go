@@ -54,7 +54,6 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 
 		c.mu.Lock()
 		c.token = response.Token
-		fmt.Println(c.token)
 		c.mu.Unlock()
 
 		return nil, nil
