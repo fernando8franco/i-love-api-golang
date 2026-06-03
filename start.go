@@ -16,6 +16,7 @@ type StartParams struct {
 type StartResponse struct {
 	Server           string `json:"server"`
 	Task             string `json:"task"`
+	RemainingFiles   string `json:"remaining_files"`
 	RemainingCredits int    `json:"remaining_credits"`
 }
 
