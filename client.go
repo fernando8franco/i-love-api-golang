@@ -16,7 +16,7 @@ type Client struct {
 	tokenDone     chan struct{}
 }
 
-func NewClient(httpClient *http.Client, apiKey, token string) *Client {
+func NewClient(httpClient *http.Client, apiKey string) *Client {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: 10 * time.Second}
 	}
@@ -24,7 +24,6 @@ func NewClient(httpClient *http.Client, apiKey, token string) *Client {
 	return &Client{
 		httpClient: httpClient,
 		apiKey:     apiKey,
-		token:      token,
 	}
 }
 
