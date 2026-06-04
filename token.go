@@ -11,12 +11,23 @@ import (
 func (c *Client) GenerateToken(ctx context.Context) error {
 	c.mu.Lock()
 
+	if c.token != "" {
+		c.mu.Unlock()
+		return nil
+	}
+
 	if c.tokenInflight {
 		ch := c.tokenDone
 		c.mu.Unlock()
 		select {
 		case <-ch:
-			return nil
+			c.mu.Lock()
+			hasToken := c.token != ""
+			c.mu.Unlock()
+			if hasToken {
+				return nil
+			}
+			return fmt.Errorf("inflight token generation failed")
 		case <-ctx.Done():
 			return ctx.Err()
 		}
