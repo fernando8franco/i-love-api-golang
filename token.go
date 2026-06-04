@@ -76,7 +76,7 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return handleError(res)
+		return handleErrorTest(res, "token: "+authURL)
 	}
 
 	var response struct {
