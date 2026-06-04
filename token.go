@@ -26,6 +26,13 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 	c.tokenDone = make(chan struct{})
 	c.mu.Unlock()
 
+	defer func() {
+		c.mu.Lock()
+		c.tokenInflight = false
+		close(c.tokenDone)
+		c.mu.Unlock()
+	}()
+
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
@@ -70,9 +77,7 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 
 	c.mu.Lock()
 	c.token = response.Token
-	c.tokenInflight = false
-	close(c.tokenDone)
 	c.mu.Unlock()
 
-	return err
+	return nil
 }
