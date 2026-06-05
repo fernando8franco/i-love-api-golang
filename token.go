@@ -11,23 +11,12 @@ import (
 func (c *Client) GenerateToken(ctx context.Context) error {
 	c.mu.Lock()
 
-	if c.token != "" {
-		c.mu.Unlock()
-		return nil
-	}
-
 	if c.tokenInflight {
 		ch := c.tokenDone
 		c.mu.Unlock()
 		select {
 		case <-ch:
-			c.mu.Lock()
-			hasToken := c.token != ""
-			c.mu.Unlock()
-			if hasToken {
-				return nil
-			}
-			return fmt.Errorf("inflight token generation failed")
+			return nil
 		case <-ctx.Done():
 			return ctx.Err()
 		}
@@ -76,7 +65,7 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 	defer res.Body.Close()
 
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		return handleErrorTest(res, "token: "+authURL)
+		return handleError(res)
 	}
 
 	var response struct {
