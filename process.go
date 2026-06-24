@@ -14,7 +14,7 @@ type ProcessParams struct {
 	Task   string  `json:"task"`
 	Tool   string  `json:"tool"`
 	Files  []Files `json:"files"`
-	Meta
+	Meta   `json:"meta"`
 	CompressOptions
 }
 
