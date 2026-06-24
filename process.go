@@ -24,15 +24,15 @@ type Files struct {
 }
 
 type Meta struct {
-	Title        string `json:"title"`
-	Author       string `json:"author"`
-	Subject      string `json:"subject"`
-	Keywords     string `json:"keywords"`
-	Creator      string `json:"creator"`
-	Producer     string `json:"producer"`
-	CreationDate string `json:"creation_date"`
-	ModDate      string `json:"mod_date"`
-	Trapped      string `json:"trapped"`
+	Title        string `json:"Title"`
+	Author       string `json:"Author"`
+	Subject      string `json:"Subject"`
+	Keywords     string `json:"Keywords"`
+	Creator      string `json:"Creator"`
+	Producer     string `json:"Producer"`
+	CreationDate string `json:"Creation_date"`
+	ModDate      string `json:"Mod_date"`
+	Trapped      string `json:"Trapped"`
 }
 
 type CompressOptions struct {
