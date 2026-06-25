@@ -30,8 +30,8 @@ type Meta struct {
 	Keywords     string `json:"Keywords"`
 	Creator      string `json:"Creator"`
 	Producer     string `json:"Producer"`
-	CreationDate string `json:"Creation_date"`
-	ModDate      string `json:"Mod_date"`
+	CreationDate string `json:"CreationDate"`
+	ModDate      string `json:"ModDate"`
 	Trapped      string `json:"Trapped"`
 }
 
