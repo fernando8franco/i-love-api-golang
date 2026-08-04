@@ -8,7 +8,6 @@ import (
 )
 
 type StartParams struct {
-	Token  string
 	Tool   string
 	Region string
 }
@@ -33,7 +32,7 @@ func (c *Client) Start(ctx context.Context, params StartParams) (StartResponse, 
 		return StartResponse{}, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.GetToken())
+	req.Header.Set("Authorization", "Bearer "+c.token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

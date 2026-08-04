@@ -9,7 +9,6 @@ import (
 )
 
 type ProcessParams struct {
-	Token  string
 	Server string
 	Task   string  `json:"task"`
 	Tool   string  `json:"tool"`
@@ -69,7 +68,7 @@ func (c *Client) Process(ctx context.Context, params ProcessParams) (ProcessResp
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.GetToken())
+	req.Header.Set("Authorization", "Bearer "+c.token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

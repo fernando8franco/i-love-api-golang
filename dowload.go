@@ -8,7 +8,6 @@ import (
 )
 
 type DowloadParams struct {
-	Token  string
 	Server string
 	Task   string
 }
@@ -26,7 +25,7 @@ func (c *Client) Download(ctx context.Context, params DowloadParams) (io.ReadClo
 		return nil, fmt.Errorf("error creating request:\n%v", err)
 	}
 
-	req.Header.Set("Authorization", "Bearer "+c.GetToken())
+	req.Header.Set("Authorization", "Bearer "+c.token)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {

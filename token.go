@@ -9,30 +9,6 @@ import (
 )
 
 func (c *Client) GenerateToken(ctx context.Context) error {
-	c.mu.Lock()
-
-	if c.tokenInflight {
-		ch := c.tokenDone
-		c.mu.Unlock()
-		select {
-		case <-ch:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-
-	c.tokenInflight = true
-	c.tokenDone = make(chan struct{})
-	c.mu.Unlock()
-
-	defer func() {
-		c.mu.Lock()
-		c.tokenInflight = false
-		close(c.tokenDone)
-		c.mu.Unlock()
-	}()
-
 	data := struct {
 		PublicKey string `json:"public_key"`
 	}{
@@ -75,9 +51,7 @@ func (c *Client) GenerateToken(ctx context.Context) error {
 		return fmt.Errorf("error decoding response: %w", err)
 	}
 
-	c.mu.Lock()
 	c.token = response.Token
-	c.mu.Unlock()
 
 	return nil
 }
