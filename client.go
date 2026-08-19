@@ -21,3 +21,7 @@ func NewClient(httpClient *http.Client, apiKey string) *Client {
 		apiKey:     apiKey,
 	}
 }
+
+func (c *Client) GetToken() string {
+	return c.token
+}
